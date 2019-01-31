@@ -1,0 +1,18 @@
+<section id="{{ include.id }}" class="main">
+    <div class="spotlight">
+        <div class="content">
+            <header class="major">
+                {{ include.header | markdownify }}
+            </header>
+            {{ include.content | markdownify }}
+            {% if include.actions == nil %}
+            <ul class="actions">
+                <li><a href="{{ include.href }}" class="button">{{ include.button_text | markdownify }}</a></li>
+            </ul>
+            {% else %}
+            {{ include.actions | markdownify }}
+            {% endif %}
+        </div>
+        <span class="icon image major style1 fa-stop hide-fa background-icon" style="background-image: url('{{ include.icon }}')"></span>
+    </div>
+</section>

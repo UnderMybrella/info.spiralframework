@@ -1,0 +1,14 @@
+---
+exclude: ['README.markdown']
+permalink: ':title'
+highlighter: rouge
+markdown: kramdown
+safe: false
+title: 'Spiral Framework'
+
+defaults:
+  -
+    scope:
+      path: "" # an empty string here means all files in the project
+    values:
+      is_post: true
