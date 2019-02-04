@@ -201,22 +201,133 @@ Spiral-OSL should *not* provide:
 - Complicated grammar unless **absolutely** necessary
     - An extension of this - we should avoid long, run on statements that require lots of parameters. Use something akin to the builder pattern, maybe?
 - A reliance on 'raw' op codes
-    - If common scripts require statements like '0x33|1, 0, 0, 1', we have failed.
+    - If common scripts require statements like '0x33\|1, 0, 0, 1', we have failed.
 
 Spiral-OSL *may* provide:
 - Localisations of the grammar, to improve the experience for people that are more comfortable writing in another language.
 
 <hr/>
 
-## Spiral-Console (Interactive)
+## Spiral-Console
+### CLIs are still relevant I swear!
+Dependencies:
+- spiral-base
+- spiral-core
+- spiral-formats
+- spiral-osl
+- Imperator
+- logback-classic
 
-<hr/>
+There are a variety of reasons a user may choose to use a CLI to operate Spiral. Users may feel more comfortable with a command line, or the flexibility we offer with automation may appeal to developers in particular.
 
-## Spiral-Console (Tool)
+Regardless, we should attempt to appeal to a large demographic with spiral-console; driving the full force of the Spiral Framework through a command line interface.
+
+Spiral-Console *should* provide:
+- A proper help command, or some other form of  **built in** documentation
+    - This was the major complaint with Spiral v2. A reliance on a poorly documented CLI
+    - The [wiki](https://wiki.spiralframework.info) is a good start, but we shouldn't be depending on an external resource for documentation.
+    - Guides may be delegated to the wiki, but ideally should be accessible from within[^cli-mediawiki-api]
+    - The most important thing with all of this is users should have the documentation to be able to perform most tasks without requiring a browser, or some other external guide
+        - Even beyond the usability of having to go back and forth, CLIs may be employed in headless environments, or other environments where searching would be equally arduous, and thus we should not be relying on them.
+    - Documentation should happen *as* features are released, as it keeps the design within the head of the author, as well as preventing buildups
+        - v2 ran into this issue; many features never got documentation simply because of the massive strain of having to document *all these features*.
+        - Document early, and document accurately.
+- Good error handling
+    - Error handling should explain what's gone wrong, and explain how to fix the error (if possible)
+        - This may or may not apply to incorrectly typed commands. Where possible, we should try and offer solutions, but it's not guaranteed
+    - If we have a system or program error, **we need to tell the user.**
+        - We inform the user of what's happened - that we broke, and how to report it
+            - The message we give the user should not be a full stacktrace - it should be a condensed version of the message
+        - This will be integrated into Jira
+        - Censor Personally Identifiable Information
+    - Ideally, we should handle errors semi-gracefully
+        - If possible, poll our issue service and request further details
+            - This may require a custom service but we will see
+        - We should tell the user (if possible) what went wrong, and what steps can be taken to fix it (such as updating)
+- Meaningful syntax for interfacing with spiral-core
+    - We want to limit long-winded commands, but sometimes that can't be helped
+        - Builder patterns, or optional parameters that prompt the user when absent, both help with this
+    - Commands should **not** rely on the presence of colours or other ANSI prompts to be meaningful
+        - Stuff like `\r` helps greatly, however don't rely on more precise cursor setting!
+        - Windows versions prior to 10 won't have ANSI enabled most likely, and even then W10 may not have it accessible or enabled for every user
+        - This applies for other properties too; don't rely on anything that isn't provided in core Java without significant testing!
+            - VMs are gonna help with this
+    - Take advantage of the fact that the user can try again! If they get part of the command wrong, maybe allow them to re enter it?
+- The user a choice between different output styles
+    - Tables look cool, but sometimes they stuff up. We shouldn't alienate people based on that
+    - Tables, plain ASCII, ANSI; these are just three of what I imagine are numerous ways of styling text for output
+    - Allow them to just, not write output, if that's what they want!
+- Feature parity between the tool and interactive versions
+    - This *does* require implementing every feature twice, but it'll be worth it I swear
+- Feature parity with the GUI version
+
+Spiral-Console should *not*:
+- Lack **core** features that Spiral-Gui has, just because it's "easier" to implement them there
+    - Pretty much the main exclusion to this is editor functions - these are highly impractical to include in a CLI
+    - We're stubborn goddamnit. We *will* find a way to make these functions work! We didn't adopt the name 'Spiral' for nothing.
+- Require "head-based" operations
+    - Don't rely on things like file selectors, view-based progress bars, etc. Assume that the user is SSH'd into a shell, and doesn't have access to a desktop environment.
+    - The user opted for the 'headless' version for a reason
+- Add undocumented features
+    - There is literally no reason for a feature to be undocumented (yes, this includes dev/debug features!)
+    - If a feature makes it into release, it must be documented!
+    
+Spiral-Console *may* provide:
+- "Head-Based" operations
+    - File selectors are one good example of something that's not harmful to *offer*, but it shouldn't be a requirement.
 
 <hr/>
 
 ## Spiral-Gui
+### Ah! The future!
+
+Spiral-Gui is going to be our "claim to fame". It's what most users will use, and it's what we will use for mod installers[^gui-installers-startup]. Thus, when implementing features, we should ensure that they are polished by the time they reach Spiral-Gui. 
+
+This *will* result in a delay with feature parity, but it's for the best.
+
+Spiral-Gui *should* provide:
+- A proper help command, or some other form of  **built in** documentation
+    - This was the major complaint with Spiral v2. A reliance on a poorly documented CLI
+    - While we don't have a CLI in this case, we should still document *how* to do things. Things should be easy to understand!
+    - The [wiki](https://wiki.spiralframework.info) is a good start, but we shouldn't be depending on an external resource for documentation.
+    - Guides may be delegated to the wiki, but ideally should be accessible from within[^cli-mediawiki-api]
+    - The most important thing with all of this is users should have the documentation to be able to perform most tasks without requiring a browser, or some other external guide
+    - Documentation should happen *as* features are released, as it keeps the design within the head of the author, as well as preventing buildups
+        - v2 ran into this issue; many features never got documentation simply because of the massive strain of having to document *all these features*.
+        - Document early, and document accurately.
+- Good error handling
+    - Error handling should explain what's gone wrong, and explain how to fix the error (if possible)
+        - This may or may not apply to incorrectly typed commands. Where possible, we should try and offer solutions, but it's not guaranteed
+    - If we have a system or program error, **we need to tell the user.**
+        - We inform the user of what's happened - that we broke, and how to report it
+            - The message we give the user should not be a full stacktrace - it should be a condensed version of the message
+        - This will be integrated into Jira
+        - Censor Personally Identifiable Information
+    - Ideally, we should handle errors semi-gracefully
+        - If possible, poll our issue service and request further details
+            - This may require a custom service but we will see
+        - We should tell the user (if possible) what went wrong, and what steps can be taken to fix it (such as updating)
+- Meaningful UX for interfacing with spiral-core
+    - Try and organise good UIs that give users access to what they want soon
+    - Do some research into accessibility for colours and the like
+        - Implement macOS styling?
+        - Regardless, **implement some kind of dark theme**
+        - Literally the most important part of the app
+    - Divide things into proper submenus. Take extra time to make it look ***good***.
+        - While one could argue functionality > aesthetics, I would argue the opposite for Spiral-Gui. We need to focus on a proper UX before delving into features.
+        - Lay the foundation and draw the plans before building the barn.
+        - Users can't do anything if they don't know *how*. Focus on functionality for the CLI, but a positive UX for the Gui.
+    - Keyboard shortcuts
+- Feature parity with the console version
+
+Spiral-Gui should *not*:
+- Require "headless" operations
+    - This includes debug printing to a console!!
+    - Debug should be redirectable to a file, but also - most importantly - if we crash we should *show* the user with a popup!
+    - Never assume there's a console attached
+- Add undocumented features
+    - There is literally no reason for a feature to be undocumented (yes, this includes dev/debug features!)
+    - If a feature makes it into release, it must be documented!
 
 <hr/>
 
@@ -236,3 +347,7 @@ Spiral-OSL *may* provide:
 [^documentation]: Which is... somewhere. I'll get to that later.
 
 [^osl-idiom]: Note that "English-Like" here is an idiom, rather than a literal statement. Localisation would be great to have, I'd just have to figure out *how*.
+
+[^cli-mediawiki-api]: Mediawiki has an API, maybe we could automatically parse it? Alternatively, Jekyll + Mediawiki API + some way to render to ASCII? A few options on the table
+
+[^gui-installers-startup]: This is a bit of a tough one, but we'll bundle Spiral-Gui for now, and potentially move to a dedicated system resource of some kind. Who knows what the future holds?

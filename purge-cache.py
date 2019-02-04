@@ -19,7 +19,7 @@ def main():
     for list in chunks(paths, 30):
         try:
             cf.zones.purge_cache.post("391427c4a21b8d2008a8b05f92ad4329", data = {'files': list})
-            print('purged ' + str(len(list)) + ' paths')
+            print('purged ' + str(len(list)) + ' paths: ' + str(list) + "\n")
         except CloudFlare.exceptions.CloudFlareAPIError as e:
             exit('purge cache - %d %s - api call failed' % (e, e))
 
